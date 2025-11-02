@@ -1,0 +1,146 @@
+import React, { useState, useEffect, useRef } from "react";
+import { Terminal, X, Maximize2 } from "lucide-react";
+import { format } from "date-fns";
+
+export default function LiveTerminal({ logs }) {
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [terminalLogs, setTerminalLogs] = useState([]);
+  const terminalRef = useRef(null);
+
+  useEffect(() => {
+    // Add incoming logs to terminal display
+    if (logs && logs.length > 0) {
+      setTerminalLogs(prev => [...logs.slice(0, 50)]);
+    } else {
+      // Mock logs for demo
+      const mockLogs = [
+        { level: 'INFO', timestamp: new Date(), service: 'NetworkScanner', message: 'Starting network scan on 192.168.1.0/24' },
+        { level: 'INFO', timestamp: new Date(), service: 'PacketSniffer', message: 'Capturing packets on interface eth0' },
+        { level: 'WARNING', timestamp: new Date(), service: 'ThreatDetector', message: 'Suspicious activity detected from 192.168.1.152' },
+        { level: 'INFO', timestamp: new Date(), service: 'NetworkScanner', message: 'Device discovered: 192.168.1.100 (WORKSTATION-01)' },
+        { level: 'ERROR', timestamp: new Date(), service: 'PacketSniffer', message: 'Failed to resolve hostname for 192.168.1.45' },
+        { level: 'INFO', timestamp: new Date(), service: 'APIServer', message: 'Health check completed - all services operational' },
+        { level: 'DEBUG', timestamp: new Date(), service: 'LogProcessor', message: 'Processing 1,247 log entries' },
+        { level: 'CRITICAL', timestamp: new Date(), service: 'ThreatDetector', message: 'ALERT: Potential intrusion attempt blocked' }
+      ];
+      setTerminalLogs(mockLogs);
+    }
+  }, [logs]);
+
+  useEffect(() => {
+    // Auto-scroll to bottom when new logs arrive
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [terminalLogs]);
+
+  const getLevelColor = (level) => {
+    const colors = {
+      INFO: 'text-cyan-400',
+      WARNING: 'text-yellow-400',
+      ERROR: 'text-red-400',
+      DEBUG: 'text-purple-400',
+      CRITICAL: 'text-pink-500'
+    };
+    return colors[level] || 'text-gray-400';
+  };
+
+  return (
+    <div className={`relative bg-black/80 backdrop-blur-lg border border-cyan-400/40 rounded-lg shadow-2xl transition-all duration-300 ${
+      isMaximized ? 'fixed inset-4 z-50' : 'h-full'
+    }`}>
+      {/* Terminal Header */}
+      <div className="flex items-center justify-between p-4 border-b border-cyan-400/20 bg-black/60">
+        <div className="flex items-center gap-3">
+          <Terminal className="w-5 h-5 text-cyan-400" />
+          <h3 className="text-lg font-bold text-cyan-400 font-mono">LIVE TERMINAL</h3>
+          <div className="flex gap-1">
+            <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
+            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsMaximized(!isMaximized)}
+            className="text-gray-400 hover:text-cyan-400 transition-colors p-1"
+          >
+            <Maximize2 className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Terminal Content */}
+      <div
+        ref={terminalRef}
+        className={`bg-black/90 font-mono text-sm overflow-y-auto custom-scrollbar ${
+          isMaximized ? 'h-full' : 'h-80'
+        }`}
+        style={{
+          background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(0,20,20,0.9) 100%)',
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        <div className="p-4 space-y-1">
+          {/* Terminal prompt */}
+          <div className="text-green-400 mb-4">
+            <span className="text-pink-400">root@iseeyou</span>
+            <span className="text-white">:</span>
+            <span className="text-cyan-400">~/network-monitor</span>
+            <span className="text-white">$ ./monitor.py --live-mode</span>
+          </div>
+
+          {/* Log entries */}
+          {terminalLogs.map((log, index) => (
+            <div key={index} className="flex gap-2 hover:bg-white/5 p-1 rounded">
+              <span className="text-gray-500 text-xs w-20 flex-shrink-0">
+                {format(new Date(log.timestamp), 'HH:mm:ss')}
+              </span>
+              <span className={`${getLevelColor(log.level)} w-16 flex-shrink-0 font-bold text-xs`}>
+                [{log.level}]
+              </span>
+              <span className="text-yellow-400 w-24 flex-shrink-0 text-xs">
+                {log.service}:
+              </span>
+              <span className="text-gray-300 text-xs flex-1">
+                {log.message}
+              </span>
+            </div>
+          ))}
+
+          {/* Active cursor */}
+          <div className="flex items-center gap-2 mt-4">
+            <span className="text-green-400">root@iseeyou:~/network-monitor$</span>
+            <div className="w-2 h-4 bg-green-400 animate-pulse" />
+          </div>
+        </div>
+      </div>
+
+      {/* Glass effect overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-transparent to-cyan-400/5 pointer-events-none rounded-lg" />
+
+      {/* Corner brackets */}
+      <div className="absolute top-1 left-1 w-4 h-4 border-l-2 border-t-2 border-cyan-400/60" />
+      <div className="absolute top-1 right-1 w-4 h-4 border-r-2 border-t-2 border-cyan-400/60" />
+      <div className="absolute bottom-1 left-1 w-4 h-4 border-l-2 border-b-2 border-cyan-400/60" />
+      <div className="absolute bottom-1 right-1 w-4 h-4 border-r-2 border-b-2 border-cyan-400/60" />
+
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(0,0,0,0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(0,255,255,0.5);
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(0,255,255,0.7);
+        }
+      `}</style>
+    </div>
+  );
+}

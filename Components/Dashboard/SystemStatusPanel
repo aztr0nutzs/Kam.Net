@@ -1,0 +1,92 @@
+import React from "react";
+import { Activity, Cpu, HardDrive, Zap, AlertTriangle } from "lucide-react";
+
+export default function SystemStatusPanel({ systemHealth }) {
+  const getStatusColor = (status) => {
+    const colors = {
+      running: "text-green-400",
+      stopped: "text-red-400",
+      error: "text-red-400",
+      warning: "text-yellow-400"
+    };
+    return colors[status] || "text-gray-400";
+  };
+
+  const mockServices = [
+    { name: "Network Scanner", status: "running", uptime: 86400, cpu: 12, memory: 45 },
+    { name: "Packet Sniffer", status: "running", uptime: 86400, cpu: 8, memory: 32 },
+    { name: "Threat Detector", status: "running", uptime: 86300, cpu: 15, memory: 28 },
+    { name: "Log Processor", status: "warning", uptime: 82000, cpu: 5, memory: 18 },
+    { name: "API Server", status: "running", uptime: 86400, cpu: 3, memory: 22 }
+  ];
+
+  return (
+    <div className="relative bg-black/60 backdrop-blur-lg border border-green-400/30 rounded-lg p-4 shadow-2xl h-fit">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-4 border-b border-green-400/20 pb-3">
+        <Activity className="w-6 h-6 text-green-400 animate-pulse" />
+        <h3 className="text-xl font-bold text-green-400 font-mono">SYSTEM STATUS</h3>
+      </div>
+
+      {/* Service Status List */}
+      <div className="space-y-3">
+        {mockServices.map((service, index) => (
+          <div key={index} className="bg-black/40 rounded-md p-3 border border-gray-700/50">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white font-mono text-sm font-semibold">
+                {service.name}
+              </span>
+              <div className={`w-2 h-2 rounded-full ${service.status === 'running' ? 'bg-green-400 animate-pulse' : service.status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'}`} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <span className="text-gray-400">CPU:</span>
+                <span className="text-cyan-400 ml-1 font-mono">{service.cpu}%</span>
+              </div>
+              <div>
+                <span className="text-gray-400">RAM:</span>
+                <span className="text-pink-400 ml-1 font-mono">{service.memory}%</span>
+              </div>
+            </div>
+
+            <div className="mt-2">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-gray-400 text-xs">Uptime:</span>
+                <span className="text-yellow-400 text-xs font-mono">
+                  {Math.floor(service.uptime / 3600)}h {Math.floor((service.uptime % 3600) / 60)}m
+                </span>
+              </div>
+
+              {/* Mini progress bars */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <div className="bg-gray-800 rounded-full h-1 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full transition-all duration-500"
+                      style={{ width: `${service.cpu}%` }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="bg-gray-800 rounded-full h-1 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-pink-400 to-purple-400 rounded-full transition-all duration-500"
+                      style={{ width: `${service.memory}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Corner brackets */}
+      <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-green-400" />
+      <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-green-400" />
+      <div className="absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-green-400" />
+      <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-green-400" />
+    </div>
+  );
+}

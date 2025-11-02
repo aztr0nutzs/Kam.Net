@@ -1,0 +1,169 @@
+import React from "react";
+import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { TrendingUp, Activity, AlertTriangle, Video } from "lucide-react";
+
+export default function AnalyticsDashboard({ cameras, events, recordings }) {
+  // Mock analytics data
+  const eventsByType = [
+    { name: 'Person', value: 45, color: '#3b82f6' },
+    { name: 'Vehicle', value: 28, color: '#10b981' },
+    { name: 'Motion', value: 67, color: '#f59e0b' },
+    { name: 'Package', value: 12, color: '#8b5cf6' },
+    { name: 'Sound', value: 8, color: '#ef4444' }
+  ];
+
+  const activityByHour = Array.from({ length: 24 }, (_, i) => ({
+    hour: `${i}:00`,
+    events: Math.floor(Math.random() * 20) + 5,
+    recordings: Math.floor(Math.random() * 10) + 2
+  }));
+
+  const cameraActivity = cameras.slice(0, 6).map(camera => ({
+    name: camera.name || `Camera ${camera.id}`,
+    events: Math.floor(Math.random() * 50) + 10,
+    storage: Math.floor(Math.random() * 100) + 20
+  }));
+
+  return (
+    <div className="space-y-6">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-black/60 backdrop-blur-lg border-2 border-blue-400/30 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Video className="w-8 h-8 text-blue-400" />
+            <div>
+              <p className="text-3xl font-bold text-blue-400">
+                {recordings.length || 24}
+              </p>
+              <p className="text-sm text-gray-400 font-mono">Total Recordings</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-black/60 backdrop-blur-lg border-2 border-yellow-400/30 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <AlertTriangle className="w-8 h-8 text-yellow-400" />
+            <div>
+              <p className="text-3xl font-bold text-yellow-400">
+                {events.length || 160}
+              </p>
+              <p className="text-sm text-gray-400 font-mono">Total Events</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-black/60 backdrop-blur-lg border-2 border-green-400/30 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Activity className="w-8 h-8 text-green-400" />
+            <div>
+              <p className="text-3xl font-bold text-green-400">98.5%</p>
+              <p className="text-sm text-gray-400 font-mono">Uptime</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-black/60 backdrop-blur-lg border-2 border-purple-400/30 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <TrendingUp className="w-8 h-8 text-purple-400" />
+            <div>
+              <p className="text-3xl font-bold text-purple-400">+23%</p>
+              <p className="text-sm text-gray-400 font-mono">vs Last Week</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Events by Type */}
+        <div className="bg-black/60 backdrop-blur-lg border-2 border-purple-400/30 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-purple-400 font-mono mb-4">
+            EVENTS BY TYPE
+          </h3>
+          <div className="h-64 flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={eventsByType}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label={(entry) => entry.name}
+                >
+                  {eventsByType.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Activity by Camera */}
+        <div className="bg-black/60 backdrop-blur-lg border-2 border-blue-400/30 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-blue-400 font-mono mb-4">
+            ACTIVITY BY CAMERA
+          </h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={cameraActivity}>
+                <XAxis
+                  dataKey="name"
+                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                />
+                <YAxis tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                <Bar dataKey="events" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Activity Timeline */}
+      <div className="bg-black/60 backdrop-blur-lg border-2 border-green-400/30 rounded-xl p-6">
+        <h3 className="text-xl font-bold text-green-400 font-mono mb-4">
+          24-HOUR ACTIVITY
+        </h3>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={activityByHour}>
+              <XAxis
+                dataKey="hour"
+                tick={{ fill: '#9ca3af', fontSize: 12 }}
+              />
+              <YAxis tick={{ fill: '#9ca3af', fontSize: 12 }} />
+              <Line
+                type="monotone"
+                dataKey="events"
+                stroke="#10b981"
+                strokeWidth={2}
+                dot={{ fill: '#10b981', r: 4 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="recordings"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                dot={{ fill: '#3b82f6', r: 4 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="flex items-center justify-center gap-6 mt-4">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-green-400 rounded-full" />
+            <span className="text-sm font-mono text-gray-400">Events</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-blue-400 rounded-full" />
+            <span className="text-sm font-mono text-gray-400">Recordings</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

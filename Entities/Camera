@@ -1,0 +1,161 @@
+{
+  "name": "Camera",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Camera name/label"
+    },
+    "location": {
+      "type": "string",
+      "description": "Physical location of camera"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "IP address of camera"
+    },
+    "port": {
+      "type": "number",
+      "default": 554,
+      "description": "RTSP port"
+    },
+    "rtsp_url": {
+      "type": "string",
+      "description": "RTSP stream URL"
+    },
+    "username": {
+      "type": "string",
+      "description": "Camera authentication username"
+    },
+    "password": {
+      "type": "string",
+      "description": "Camera authentication password (encrypted)"
+    },
+    "manufacturer": {
+      "type": "string",
+      "description": "Camera manufacturer"
+    },
+    "model": {
+      "type": "string",
+      "description": "Camera model"
+    },
+    "resolution": {
+      "type": "string",
+      "enum": [
+        "720p",
+        "1080p",
+        "2K",
+        "4K"
+      ],
+      "default": "1080p",
+      "description": "Video resolution"
+    },
+    "fps": {
+      "type": "number",
+      "default": 30,
+      "description": "Frames per second"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "online",
+        "offline",
+        "recording",
+        "error"
+      ],
+      "default": "offline",
+      "description": "Camera status"
+    },
+    "is_recording": {
+      "type": "boolean",
+      "default": false,
+      "description": "Is currently recording"
+    },
+    "motion_detection_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Motion detection enabled"
+    },
+    "motion_sensitivity": {
+      "type": "number",
+      "default": 50,
+      "description": "Motion detection sensitivity (0-100)"
+    },
+    "night_vision_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Night vision enabled"
+    },
+    "audio_enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Audio recording enabled"
+    },
+    "ptz_enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Pan-Tilt-Zoom capable"
+    },
+    "pan_position": {
+      "type": "number",
+      "default": 0,
+      "description": "Current pan position (-180 to 180)"
+    },
+    "tilt_position": {
+      "type": "number",
+      "default": 0,
+      "description": "Current tilt position (-90 to 90)"
+    },
+    "zoom_level": {
+      "type": "number",
+      "default": 1,
+      "description": "Current zoom level (1-10)"
+    },
+    "storage_used_gb": {
+      "type": "number",
+      "default": 0,
+      "description": "Storage used in GB"
+    },
+    "last_online": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last time camera was online"
+    },
+    "thumbnail_url": {
+      "type": "string",
+      "description": "Latest camera snapshot URL"
+    },
+    "stream_quality": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "ultra"
+      ],
+      "default": "high",
+      "description": "Stream quality setting"
+    },
+    "recording_schedule": {
+      "type": "object",
+      "description": "Recording schedule configuration"
+    },
+    "detection_zones": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Motion detection zones"
+    },
+    "alert_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Send alerts on motion detection"
+    }
+  },
+  "required": [
+    "name",
+    "ip_address",
+    "rtsp_url"
+  ]
+}

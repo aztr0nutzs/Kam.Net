@@ -1,0 +1,196 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Zap, Pause, RotateCcw, Settings, Target, Menu, Rocket, Shield } from "lucide-react";
+
+export default function ScanControls({ onScanTrigger, isScanning, onOpenMenu, consentGranted }) {
+  const [selectedScanType, setSelectedScanType] = useState("standard");
+
+  const scanTypes = {
+    standard: { label: "Standard", color: "green", duration: "~3min" },
+    deep: { label: "Deep Scan", color: "blue", duration: "~10min" },
+    stealth: { label: "Stealth", color: "purple", duration: "~15min" }
+  };
+
+  return (
+    <div className="relative bg-black/70 backdrop-blur-xl border-2 border-purple-400/40 rounded-xl p-6 shadow-2xl overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-400/5 via-transparent to-cyan-400/5 animate-pulse" />
+
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6 border-b border-purple-400/30 pb-4 relative z-10">
+        <Target className="w-7 h-7 text-purple-400 animate-pulse" />
+        <h3 className="text-xl font-bold text-purple-400 font-mono">SCAN CONTROLS</h3>
+        <div className="ml-auto flex gap-2">
+          {Array.from({length: 3}).map((_, i) => (
+            <div
+              key={i}
+              className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"
+              style={{animationDelay: `${i * 0.3}s`}}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Consent Status */}
+      {!consentGranted && (
+        <div className="relative z-10 mb-4 p-3 bg-yellow-400/10 border border-yellow-400/30 rounded-lg">
+          <div className="flex items-center gap-2 text-yellow-400 text-sm font-mono">
+            <Shield className="w-4 h-4" />
+            <span>Consent required to scan</span>
+          </div>
+        </div>
+      )}
+
+      {/* Scan Type Selection */}
+      <div className="space-y-3 mb-6 relative z-10">
+        <label className="text-purple-300 font-mono text-sm">SCAN TYPE:</label>
+        <div className="grid grid-cols-1 gap-2">
+          {Object.entries(scanTypes).map(([key, type]) => (
+            <button
+              key={key}
+              onClick={() => setSelectedScanType(key)}
+              disabled={!consentGranted}
+              className={`p-3 rounded-lg border-2 font-mono text-sm transition-all duration-300 relative overflow-hidden ${
+                selectedScanType === key
+                  ? `border-${type.color}-400 bg-${type.color}-400/20 text-${type.color}-400`
+                  : 'border-gray-600/50 text-gray-400 hover:border-gray-500'
+              } ${!consentGranted ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <div className="flex items-center justify-between">
+                <span>{type.label}</span>
+                <span className="text-xs opacity-70">{type.duration}</span>
+              </div>
+              {selectedScanType === key && (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-current/10 to-transparent animate-pulse" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Control Buttons */}
+      <div className="space-y-3 relative z-10">
+        <Button
+          onClick={onScanTrigger}
+          disabled={isScanning || !consentGranted}
+          className={`w-full font-mono text-sm transition-all duration-500 relative overflow-hidden ${
+            isScanning
+              ? 'bg-gray-600/50 text-gray-400 border-gray-600/50'
+              : consentGranted
+              ? 'bg-gradient-to-r from-green-400/20 to-cyan-400/20 hover:from-green-400/30 hover:to-cyan-400/30 text-green-400 border-2 border-green-400/50 hover:border-green-400 hover:shadow-lg hover:shadow-green-400/30'
+              : 'bg-gray-600/30 text-gray-500 border-gray-600/30 cursor-not-allowed'
+          }`}
+        >
+          {isScanning ? (
+            <>
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                SCANNING {selectedScanType.toUpperCase()}...
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
+            </>
+          ) : (
+            <>
+              <Rocket className="w-4 h-4 mr-2" />
+              INITIATE {selectedScanType.toUpperCase()} SCAN
+            </>
+          )}
+        </Button>
+
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant="outline"
+            disabled={!consentGranted}
+            className="font-mono text-xs bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/50 hover:shadow-lg hover:shadow-yellow-400/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Pause className="w-4 h-4 mr-1" />
+            PAUSE
+          </Button>
+
+          <Button
+            variant="outline"
+            disabled={!consentGranted}
+            className="font-mono text-xs bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-400 border-cyan-400/50 hover:shadow-lg hover:shadow-cyan-400/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <RotateCcw className="w-4 h-4 mr-1" />
+            RESET
+          </Button>
+        </div>
+
+        <Button
+          onClick={onOpenMenu}
+          disabled={!consentGranted}
+          className="w-full font-mono text-sm bg-purple-400/10 hover:bg-purple-400/20 text-purple-400 border-2 border-purple-400/50 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-400/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Menu className="w-4 h-4 mr-2" />
+          ADVANCED OPTIONS
+        </Button>
+      </div>
+
+      {/* System Status */}
+      <div className="mt-6 p-4 bg-black/50 rounded-lg border border-gray-700/50 relative z-10">
+        <div className="space-y-3 text-xs font-mono">
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">SCAN INTERVAL:</span>
+            <span className="text-cyan-400">300s</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">TARGET SUBNET:</span>
+            <span className="text-pink-400">192.168.1.0/24</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">INTERFACE:</span>
+            <span className="text-green-400 flex items-center gap-1">
+              eth0
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">THREADS:</span>
+            <span className="text-yellow-400">{selectedScanType === 'deep' ? '16' : selectedScanType === 'stealth' ? '4' : '8'}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">CONSENT STATUS:</span>
+            <span className={consentGranted ? "text-green-400" : "text-red-400"}>
+              {consentGranted ? 'GRANTED' : 'REQUIRED'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Real-time activity indicators */}
+      {isScanning && (
+        <div className="mt-4 flex items-center justify-center relative z-10">
+          <div className="flex gap-1">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-1 h-8 bg-gradient-to-t from-green-400 to-cyan-400 animate-pulse"
+                style={{
+                  animationDelay: `${i * 0.15}s`,
+                  animationDuration: '1.2s'
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Holographic corners */}
+      <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-purple-400 opacity-60 animate-pulse" />
+      <div className="absolute top-2 right-2 w-6 h-6 border-r-2 border-t-2 border-purple-400 opacity-60 animate-pulse" />
+      <div className="absolute bottom-2 left-2 w-6 h-6 border-l-2 border-b-2 border-purple-400 opacity-60 animate-pulse" />
+      <div className="absolute bottom-2 right-2 w-6 h-6 border-r-2 border-b-2 border-purple-400 opacity-60 animate-pulse" />
+
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        .animate-shimmer {
+          animation: shimmer 2s infinite;
+        }
+      `}</style>
+    </div>
+  );
+}

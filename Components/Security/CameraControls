@@ -1,0 +1,294 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  ArrowUp, ArrowDown, ArrowLeft, ArrowRight,
+  ZoomIn, ZoomOut, RotateCcw, Eye, Moon,
+  Volume2, Bell, Settings, Power
+} from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+
+export default function CameraControls({ camera, onUpdateCamera }) {
+  const [panPosition, setPanPosition] = useState(camera.pan_position || 0);
+  const [tiltPosition, setTiltPosition] = useState(camera.tilt_position || 0);
+  const [zoomLevel, setZoomLevel] = useState(camera.zoom_level || 1);
+  const [motionSensitivity, setMotionSensitivity] = useState(camera.motion_sensitivity || 50);
+
+  const handlePTZControl = (action) => {
+    let newPan = panPosition;
+    let newTilt = tiltPosition;
+    let newZoom = zoomLevel;
+
+    switch(action) {
+      case 'up':
+        newTilt = Math.min(90, tiltPosition + 10);
+        break;
+      case 'down':
+        newTilt = Math.max(-90, tiltPosition - 10);
+        break;
+      case 'left':
+        newPan = Math.max(-180, panPosition - 10);
+        break;
+      case 'right':
+        newPan = Math.min(180, panPosition + 10);
+        break;
+      case 'zoom-in':
+        newZoom = Math.min(10, zoomLevel + 0.5);
+        break;
+      case 'zoom-out':
+        newZoom = Math.max(1, zoomLevel - 0.5);
+        break;
+      case 'reset':
+        newPan = 0;
+        newTilt = 0;
+        newZoom = 1;
+        break;
+    }
+
+    setPanPosition(newPan);
+    setTiltPosition(newTilt);
+    setZoomLevel(newZoom);
+
+    onUpdateCamera({
+      pan_position: newPan,
+      tilt_position: newTilt,
+      zoom_level: newZoom
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* PTZ Controls */}
+      {camera.ptz_enabled && (
+        <div className="bg-black/60 backdrop-blur-lg border-2 border-purple-400/30 rounded-xl p-4 shadow-xl">
+          <h3 className="text-lg font-bold text-purple-400 font-mono mb-4 flex items-center gap-2">
+            <Settings className="w-5 h-5" />
+            PTZ CONTROLS
+          </h3>
+
+          {/* Directional Pad */}
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            <div />
+            <Button
+              variant="outline"
+              onClick={() => handlePTZControl('up')}
+              className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border-purple-400/50"
+            >
+              <ArrowUp className="w-5 h-5" />
+            </Button>
+            <div />
+
+            <Button
+              variant="outline"
+              onClick={() => handlePTZControl('left')}
+              className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border-purple-400/50"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handlePTZControl('reset')}
+              className="bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 border-gray-400/50"
+            >
+              <RotateCcw className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handlePTZControl('right')}
+              className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border-purple-400/50"
+            >
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+
+            <div />
+            <Button
+              variant="outline"
+              onClick={() => handlePTZControl('down')}
+              className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border-purple-400/50"
+            >
+              <ArrowDown className="w-5 h-5" />
+            </Button>
+            <div />
+          </div>
+
+          {/* Zoom Controls */}
+          <div className="flex gap-2 mb-4">
+            <Button
+              variant="outline"
+              onClick={() => handlePTZControl('zoom-out')}
+              className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border-blue-400/50"
+            >
+              <ZoomOut className="w-5 h-5 mr-2" />
+              Zoom Out
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handlePTZControl('zoom-in')}
+              className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border-blue-400/50"
+            >
+              <ZoomIn className="w-5 h-5 mr-2" />
+              Zoom In
+            </Button>
+          </div>
+
+          {/* Position Display */}
+          <div className="bg-black/40 rounded-lg p-3 space-y-2 text-xs font-mono">
+            <div className="flex justify-between">
+              <span className="text-gray-400">Pan:</span>
+              <span className="text-cyan-400">{panPosition}°</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Tilt:</span>
+              <span className="text-cyan-400">{tiltPosition}°</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Zoom:</span>
+              <span className="text-cyan-400">{zoomLevel.toFixed(1)}x</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Camera Settings */}
+      <div className="bg-black/60 backdrop-blur-lg border-2 border-green-400/30 rounded-xl p-4 shadow-xl">
+        <h3 className="text-lg font-bold text-green-400 font-mono mb-4 flex items-center gap-2">
+          <Eye className="w-5 h-5" />
+          CAMERA SETTINGS
+        </h3>
+
+        <div className="space-y-4">
+          {/* Motion Detection */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-mono text-gray-300">Motion Detection</label>
+              <button
+                onClick={() => onUpdateCamera({
+                  motion_detection_enabled: !camera.motion_detection_enabled
+                })}
+                className={`px-3 py-1 rounded-md text-xs font-mono transition-all ${
+                  camera.motion_detection_enabled
+                    ? 'bg-green-500/20 text-green-400 border border-green-400'
+                    : 'bg-gray-500/20 text-gray-400 border border-gray-400'
+                }`}
+              >
+                {camera.motion_detection_enabled ? 'ON' : 'OFF'}
+              </button>
+            </div>
+
+            {camera.motion_detection_enabled && (
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-400">Sensitivity</span>
+                  <span className="text-xs text-cyan-400">{motionSensitivity}%</span>
+                </div>
+                <Slider
+                  value={[motionSensitivity]}
+                  onValueChange={(value) => {
+                    setMotionSensitivity(value[0]);
+                    onUpdateCamera({ motion_sensitivity: value[0] });
+                  }}
+                  max={100}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Night Vision */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Moon className="w-4 h-4 text-blue-400" />
+              <label className="text-sm font-mono text-gray-300">Night Vision</label>
+            </div>
+            <button
+              onClick={() => onUpdateCamera({
+                night_vision_enabled: !camera.night_vision_enabled
+              })}
+              className={`px-3 py-1 rounded-md text-xs font-mono transition-all ${
+                camera.night_vision_enabled
+                  ? 'bg-blue-500/20 text-blue-400 border border-blue-400'
+                  : 'bg-gray-500/20 text-gray-400 border border-gray-400'
+              }`}
+            >
+              {camera.night_vision_enabled ? 'ON' : 'OFF'}
+            </button>
+          </div>
+
+          {/* Audio */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Volume2 className="w-4 h-4 text-yellow-400" />
+              <label className="text-sm font-mono text-gray-300">Audio</label>
+            </div>
+            <button
+              onClick={() => onUpdateCamera({
+                audio_enabled: !camera.audio_enabled
+              })}
+              className={`px-3 py-1 rounded-md text-xs font-mono transition-all ${
+                camera.audio_enabled
+                  ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-400'
+                  : 'bg-gray-500/20 text-gray-400 border border-gray-400'
+              }`}
+            >
+              {camera.audio_enabled ? 'ON' : 'OFF'}
+            </button>
+          </div>
+
+          {/* Alerts */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-pink-400" />
+              <label className="text-sm font-mono text-gray-300">Alerts</label>
+            </div>
+            <button
+              onClick={() => onUpdateCamera({
+                alert_enabled: !camera.alert_enabled
+              })}
+              className={`px-3 py-1 rounded-md text-xs font-mono transition-all ${
+                camera.alert_enabled
+                  ? 'bg-pink-500/20 text-pink-400 border border-pink-400'
+                  : 'bg-gray-500/20 text-gray-400 border border-gray-400'
+              }`}
+            >
+              {camera.alert_enabled ? 'ON' : 'OFF'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Camera Status */}
+      <div className="bg-black/60 backdrop-blur-lg border-2 border-cyan-400/30 rounded-xl p-4 shadow-xl">
+        <h3 className="text-lg font-bold text-cyan-400 font-mono mb-4 flex items-center gap-2">
+          <Power className="w-5 h-5" />
+          STATUS
+        </h3>
+
+        <div className="space-y-2 text-sm font-mono">
+          <div className="flex justify-between">
+            <span className="text-gray-400">Status:</span>
+            <span className={`${
+              camera.status === 'online' ? 'text-green-400' :
+              camera.status === 'recording' ? 'text-blue-400' :
+              camera.status === 'offline' ? 'text-red-400' :
+              'text-yellow-400'
+            }`}>
+              {camera.status.toUpperCase()}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-400">Resolution:</span>
+            <span className="text-purple-400">{camera.resolution}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-400">FPS:</span>
+            <span className="text-cyan-400">{camera.fps || 30}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-400">Storage:</span>
+            <span className="text-yellow-400">{camera.storage_used_gb || 0} GB</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

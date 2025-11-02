@@ -1,0 +1,88 @@
+{
+  "name": "CameraEvent",
+  "type": "object",
+  "properties": {
+    "camera_id": {
+      "type": "string",
+      "description": "Reference to Camera entity"
+    },
+    "camera_name": {
+      "type": "string",
+      "description": "Camera name for quick reference"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "motion",
+        "person",
+        "vehicle",
+        "animal",
+        "package",
+        "sound",
+        "tampering",
+        "offline",
+        "online"
+      ],
+      "description": "Type of event detected"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Event timestamp"
+    },
+    "confidence": {
+      "type": "number",
+      "description": "Detection confidence (0-100)"
+    },
+    "snapshot_url": {
+      "type": "string",
+      "description": "URL to event snapshot image"
+    },
+    "video_clip_url": {
+      "type": "string",
+      "description": "URL to event video clip"
+    },
+    "recording_id": {
+      "type": "string",
+      "description": "Associated recording ID"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium",
+      "description": "Event severity level"
+    },
+    "acknowledged": {
+      "type": "boolean",
+      "default": false,
+      "description": "Event has been acknowledged"
+    },
+    "notification_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Notification was sent to user"
+    },
+    "detection_zone": {
+      "type": "string",
+      "description": "Zone where event was detected"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional event metadata"
+    },
+    "ai_analysis": {
+      "type": "string",
+      "description": "AI-generated analysis of event"
+    }
+  },
+  "required": [
+    "camera_id",
+    "event_type",
+    "timestamp"
+  ]
+}

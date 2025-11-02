@@ -1,0 +1,63 @@
+{
+  "name": "SecurityZone",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Zone name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Zone description"
+    },
+    "zone_type": {
+      "type": "string",
+      "enum": [
+        "indoor",
+        "outdoor",
+        "perimeter",
+        "entry",
+        "restricted"
+      ],
+      "description": "Type of security zone"
+    },
+    "camera_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Cameras covering this zone"
+    },
+    "armed": {
+      "type": "boolean",
+      "default": true,
+      "description": "Zone is armed for detection"
+    },
+    "alert_level": {
+      "type": "string",
+      "enum": [
+        "none",
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium",
+      "description": "Alert sensitivity level"
+    },
+    "schedule": {
+      "type": "object",
+      "description": "Zone arming schedule"
+    },
+    "notification_contacts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Contacts to notify on events"
+    }
+  },
+  "required": [
+    "name",
+    "zone_type"
+  ]
+}

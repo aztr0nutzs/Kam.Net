@@ -1,0 +1,218 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { X, Camera } from "lucide-react";
+
+export default function AddCameraDialog({ onClose, onAdd }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    location: '',
+    ip_address: '',
+    port: 554,
+    rtsp_url: '',
+    username: '',
+    password: '',
+    manufacturer: '',
+    model: '',
+    resolution: '1080p',
+    fps: 30,
+    ptz_enabled: false,
+    motion_detection_enabled: true,
+    night_vision_enabled: true,
+    audio_enabled: false,
+    alert_enabled: true,
+    status: 'offline'
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onAdd(formData);
+  };
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="bg-gray-900 border-2 border-blue-400/50 rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Camera className="w-6 h-6 text-blue-400" />
+            <h2 className="text-2xl font-bold text-blue-400 font-mono">ADD NEW CAMERA</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm font-mono text-gray-300">Camera Name *</Label>
+              <Input
+                value={formData.name}
+                onChange={(e) => handleChange('name', e.target.value)}
+                placeholder="e.g., Front Door"
+                required
+                className="bg-black/40 border-blue-400/50 text-white"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm font-mono text-gray-300">Location *</Label>
+              <Input
+                value={formData.location}
+                onChange={(e) => handleChange('location', e.target.value)}
+                placeholder="e.g., Main Entrance"
+                required
+                className="bg-black/40 border-blue-400/50 text-white"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm font-mono text-gray-300">IP Address *</Label>
+              <Input
+                value={formData.ip_address}
+                onChange={(e) => handleChange('ip_address', e.target.value)}
+                placeholder="192.168.1.100"
+                required
+                className="bg-black/40 border-blue-400/50 text-white"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm font-mono text-gray-300">RTSP Port</Label>
+              <Input
+                type="number"
+                value={formData.port}
+                onChange={(e) => handleChange('port', parseInt(e.target.value))}
+                className="bg-black/40 border-blue-400/50 text-white"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <Label className="text-sm font-mono text-gray-300">RTSP URL *</Label>
+              <Input
+                value={formData.rtsp_url}
+                onChange={(e) => handleChange('rtsp_url', e.target.value)}
+                placeholder="rtsp://192.168.1.100:554/stream"
+                required
+                className="bg-black/40 border-blue-400/50 text-white"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm font-mono text-gray-300">Username</Label>
+              <Input
+                value={formData.username}
+                onChange={(e) => handleChange('username', e.target.value)}
+                placeholder="admin"
+                className="bg-black/40 border-blue-400/50 text-white"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm font-mono text-gray-300">Password</Label>
+              <Input
+                type="password"
+                value={formData.password}
+                onChange={(e) => handleChange('password', e.target.value)}
+                className="bg-black/40 border-blue-400/50 text-white"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm font-mono text-gray-300">Manufacturer</Label>
+              <Input
+                value={formData.manufacturer}
+                onChange={(e) => handleChange('manufacturer', e.target.value)}
+                placeholder="e.g., Hikvision"
+                className="bg-black/40 border-blue-400/50 text-white"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm font-mono text-gray-300">Model</Label>
+              <Input
+                value={formData.model}
+                onChange={(e) => handleChange('model', e.target.value)}
+                placeholder="e.g., DS-2CD2143G0-I"
+                className="bg-black/40 border-blue-400/50 text-white"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm font-mono text-gray-300">Resolution</Label>
+              <select
+                value={formData.resolution}
+                onChange={(e) => handleChange('resolution', e.target.value)}
+                className="w-full px-3 py-2 bg-black/40 border border-blue-400/50 rounded-md text-white"
+              >
+                <option value="720p">720p</option>
+                <option value="1080p">1080p</option>
+                <option value="2K">2K</option>
+                <option value="4K">4K</option>
+              </select>
+            </div>
+
+            <div>
+              <Label className="text-sm font-mono text-gray-300">FPS</Label>
+              <Input
+                type="number"
+                value={formData.fps}
+                onChange={(e) => handleChange('fps', parseInt(e.target.value))}
+                className="bg-black/40 border-blue-400/50 text-white"
+              />
+            </div>
+          </div>
+
+          {/* Checkboxes */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-blue-400/20">
+            {[
+              { key: 'ptz_enabled', label: 'PTZ Capable' },
+              { key: 'motion_detection_enabled', label: 'Motion Detection' },
+              { key: 'night_vision_enabled', label: 'Night Vision' },
+              { key: 'audio_enabled', label: 'Audio' },
+              { key: 'alert_enabled', label: 'Alerts' }
+            ].map(({ key, label }) => (
+              <label key={key} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData[key]}
+                  onChange={(e) => handleChange(key, e.target.checked)}
+                  className="w-4 h-4 rounded border-blue-400/50 bg-black/40"
+                />
+                <span className="text-sm font-mono text-gray-300">{label}</span>
+              </label>
+            ))}
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="flex-1 bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 border-gray-400/50"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="flex-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border-2 border-blue-400/50"
+            >
+              Add Camera
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
